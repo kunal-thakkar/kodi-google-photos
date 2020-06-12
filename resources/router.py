@@ -43,7 +43,7 @@ def Router():
             data = client.getAlbumItems(albumId, pageToken)
         for mediaItem in data.get('mediaItems', []):
             title = mediaItem.get("filename")
-            icon = mediaItem.get('baseUrl')+"=w150-h100"
+            icon = mediaItem.get('baseUrl')+"=w256-h256"
             li = xbmcgui.ListItem(title, iconImage=icon)
             li.setArt({ "thumb": icon })
             li.setProperty('IsPlayable', 'true')

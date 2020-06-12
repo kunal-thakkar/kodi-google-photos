@@ -34,7 +34,10 @@ class GoogleRestClient():
 
 	def doGet(self, url):
 		res = requests.get(url, headers = {
-			"Authorization": "Bearer {}".format(self.CREDS.get("access_token"))})
+			"Authorization": "Bearer {}".format(self.CREDS.get("access_token")),
+			"Accept-Encoding":"gzip",
+			"User-Agent":"kodi (gzip)"
+		})
 		if res.status_code == 200:
 			return res.json()
 		elif res.status_code == 401 and self.refreshToken():
@@ -47,14 +50,19 @@ class GoogleRestClient():
 
 	def getMediaItems(self, pageToken = None):
 		return self.doGet("https://photoslibrary.googleapis.com/v1/mediaItems"+ 
-		"?fields=mediaItems(baseUrl,mimeType,filename,mediaMetadata/width,mediaMetadata/height)"+
-		("pageToken={}".format(pageToken) if pageToken else ""))
+		"?fields=nextPageToken,mediaItems(baseUrl,mimeType,filename,mediaMetadata/width,mediaMetadata/height)"+
+		"&pageSize=100"+
+		("&pageToken={}".format(pageToken) if pageToken else ""))
 
 	def getAlbumItems(self, albumId, pageToken = None):
 		res = requests.post("https://photoslibrary.googleapis.com/v1/mediaItems:search"+
-			"?fields=mediaItems(baseUrl,mimeType,filename,mediaMetadata/width,mediaMetadata/height)",
-			json={"albumId": albumId, "pageToken": pageToken},
-			headers={"Authorization": "Bearer {}".format(self.CREDS.get("access_token"))})
+			"?fields=nextPageToken,mediaItems(baseUrl,mimeType,filename,mediaMetadata/width,mediaMetadata/height)",
+			json={"albumId": albumId, "pageToken": pageToken, "pageSize":100 },
+			headers={
+				"Authorization": "Bearer {}".format(self.CREDS.get("access_token")),
+				"Accept-Encoding":"gzip",
+				"User-Agent":"kodi (gzip)"
+			})
 		if res.status_code == 200:
 			return res.json()
 		elif res.status_code == 401 and self.refreshToken():
